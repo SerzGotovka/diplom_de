@@ -1,0 +1,1 @@
+SELECT user_id, community_id, joined_at FROM dds.group_members;

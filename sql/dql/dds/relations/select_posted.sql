@@ -1,0 +1,1 @@
+SELECT user_id, post_id, created_at FROM dds.posts;

@@ -1,0 +1,1 @@
+SELECT user_id, friend_id, created_at FROM dds.friends;

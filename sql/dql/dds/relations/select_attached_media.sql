@@ -1,0 +1,1 @@
+SELECT attached_to_post, media_id FROM dds.media;

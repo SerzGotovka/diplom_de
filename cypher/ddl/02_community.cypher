@@ -1,0 +1,1 @@
+CREATE CONSTRAINT IF NOT EXISTS FOR (cm:Community) REQUIRE cm.community_id IS UNIQUE;

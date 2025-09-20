@@ -1,0 +1,2 @@
+SELECT community_id, post_id
+FROM dds.pinned_posts;
