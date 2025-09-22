@@ -4,9 +4,6 @@
 
 Данный проект представляет собой комплексную систему обработки данных для социальной сети, построенную на основе современных технологий Data Engineering. Система включает в себя генерацию тестовых данных, их обработку через различные слои (RAW, DDS, Data Marts) и визуализацию результатов.
 
-## 🏗️ Архитектура системы
-
-Проект реализует многослойную архитектуру данных (Data Lakehouse) с использованием следующих компонентов:
 
 ### Основные технологии:
 - **Apache Airflow** - оркестрация ETL процессов
@@ -24,17 +21,11 @@
 3. **Data Marts** - агрегированные данные в ClickHouse
 
 ## 📊 Диаграмма архитектуры
+![Alt text](docs/architecture.png)
 
 ![Архитектура системы](docs/architecture.png)
 
 ## 🚀 Быстрый старт
-
-### Предварительные требования
-
-- Docker и Docker Compose
-- Минимум 4GB RAM
-- Минимум 2 CPU
-- 10GB свободного места на диске
 
 ### Установка и запуск
 
@@ -48,24 +39,24 @@ cd diplom-tms
 Создайте файл `.env` в корне проекта:
 ```env
 # Airflow
-AIRFLOW_UID=50000
-POSTGRES_USER=airflow
-POSTGRES_PASSWORD=airflow
-POSTGRES_DB=airflow
+AIRFLOW_UID
+POSTGRES_USER
+POSTGRES_PASSWORD
+POSTGRES_DB
 
 # ClickHouse
-CLICKHOUSE_USER=airflow
-CLICKHOUSE_PASSWORD=airflow
-CLICKHOUSE_DB=data_mart
+CLICKHOUSE_USER
+CLICKHOUSE_PASSWORD
+CLICKHOUSE_DB
 
 # Neo4j
-NEO4J_USER=neo4j
-NEO4J_PASSWORD=password
+NEO4J_USER
+NEO4J_PASSWORD
 
 # MinIO
-MINIO_ROOT_USER=minioadmin
-MINIO_ROOT_PASSWORD=minioadmin
-MINIO_BUCKET=events
+MINIO_ROOT_USER
+MINIO_ROOT_PASSWORD
+MINIO_BUCKET
 ```
 
 3. **Запуск системы:**
@@ -214,38 +205,36 @@ diplom-tms/
 
 ```env
 # База данных
-POSTGRES_HOST=postgres
-POSTGRES_PORT=5432
-POSTGRES_USER=airflow
-POSTGRES_PASSWORD=airflow
-POSTGRES_DB=airflow
+POSTGRES_HOST
+POSTGRES_PORT
+POSTGRES_USER
+POSTGRES_PASSWORD
+POSTGRES_DB
 
 # ClickHouse
-CLICKHOUSE_HOST=clickhouse
-CLICKHOUSE_PORT=9000
-CLICKHOUSE_USER=airflow
-CLICKHOUSE_PASSWORD=airflow
-CLICKHOUSE_DB=data_mart
+CLICKHOUSE_HOST
+CLICKHOUSE_PORT
+CLICKHOUSE_USER
+CLICKHOUSE_PASSWORD
+CLICKHOUSE_DB
 
 # Neo4j
-NEO4J_HOST=neo4j
-NEO4J_PORT=7687
-NEO4J_USER=neo4j
-NEO4J_PASSWORD=password
+NEO4J_HOST
+NEO4J_PORT
+NEO4J_USER
+NEO4J_PASSWORD
 
 # Kafka
-KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+KAFKA_BOOTSTRAP_SERVERS
 
 # MinIO
-MINIO_BUCKET=events
+MINIO_BUCKET
 ```
 
 ## 🚨 Устранение неполадок
 
 ### Проблемы с запуском
 
-1. **Недостаточно памяти:**
-   - Увеличьте лимит памяти Docker до 4GB+
 
 2. **Ошибки подключения к БД:**
    - Проверьте, что все контейнеры запущены: `docker-compose ps`

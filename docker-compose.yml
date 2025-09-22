@@ -71,29 +71,7 @@ x-airflow-common:
     # WARNING: Use _PIP_ADDITIONAL_REQUIREMENTS option ONLY for a quick checks
     # for other purpose (development, test and especially production usage) build/extend Airflow image.
     _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:- pandas pydantic faker openpyxl pymongo clickhouse-driver neo4j kafka-python minio}
-    
-    # Database connection variables
-    POSTGRES_HOST: postgres
-    POSTGRES_PORT: 5432
-    POSTGRES_USER: ${POSTGRES_USER:-airflow}
-    POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-airflow}
-    POSTGRES_DB: ${POSTGRES_DB:-airflow}
-    
-    CLICKHOUSE_HOST: clickhouse
-    CLICKHOUSE_PORT: 9000
-    CLICKHOUSE_USER: ${CLICKHOUSE_USER:-airflow}
-    CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-airflow}
-    CLICKHOUSE_DB: ${CLICKHOUSE_DB:-data_mart}
-    
-    NEO4J_HOST: neo4j
-    NEO4J_PORT: 7687
-    NEO4J_USER: ${NEO4J_USER:-neo4j}
-    NEO4J_PASSWORD: ${NEO4J_PASSWORD:-password}
-    
-    # Kafka configuration
-    KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-    MINIO_BUCKET: ${MINIO_BUCKET:-events}
-    
+       
   volumes:
     - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
@@ -101,6 +79,7 @@ x-airflow-common:
     - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
     - ${AIRFLOW_PROJ_DIR:-.}/sql:/opt/airflow/sql
     - ${AIRFLOW_PROJ_DIR:-.}/cypher:/opt/airflow/cypher
+    - ${AIRFLOW_PROJ_DIR:-.}/postgres_backups:/opt/airflow/postgres_backups
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
@@ -120,9 +99,9 @@ services:
     image: postgres:13
     container_name: postgres
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-airflow}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-airflow}
-      POSTGRES_DB: ${POSTGRES_DB:-airflow}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - postgres-db-volume:/var/lib/postgresql/data
     healthcheck:
@@ -153,8 +132,8 @@ services:
       - "9002:9000"
       - "9001:9001"
     environment:
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     command: server /data --console-address :9001
     volumes:
       - minio_data:/data
@@ -172,24 +151,24 @@ services:
       - "7474:7474"     # HTTP
       - "7687:7687"     # Bolt (драйвер)
     environment:
-      - NEO4J_AUTH=${NEO4J_USER:-neo4j}/${NEO4J_PASSWORD:-password}   # Установка логина и пароля
+      - NEO4J_AUTH=${NEO4J_USER}/${NEO4J_PASSWORD}   # Установка логина и пароля
       - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
     volumes:
       - neo4j_data:/data         # Постоянное хранение данных
       - neo4j_logs:/los         # Логи
 
   metabase:
-    image: metabase/metabase:latest
+    image: metabase/metabase:2.39.2
     container_name: metabase
     ports:
       - "3000:3000"
     environment:
-      - MB_DB_TYPE=postgres
-      - MB_DB_DBNAME=metabase
-      - MB_DB_PORT=5432
-      - MB_DB_HOST=postgres
-      - MB_DB_USER=metabase
-      - MB_DB_PASS=metabase
+      - MB_DB_TYPE=${MB_DB_TYPE}
+      - MB_DB_DBNAME=${MB_DB_DBNAME}
+      - MB_DB_PORT=${MB_DB_PORT}
+      - MB_DB_HOST=${MB_DB_HOST}
+      - MB_DB_USER=${MB_DB_USER}
+      - MB_DB_PASS=${MB_DB_PASS}
     volumes:
       - metabase_data:/metabase-data
     networks:
@@ -206,9 +185,9 @@ services:
         soft: 262144
         hard: 262144
     environment:
-      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-airflow}
-      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-airflow}
-      CLICKHOUSE_DB: ${CLICKHOUSE_DB:-data_mart}
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD}
+      CLICKHOUSE_DB: ${CLICKHOUSE_DB}
     volumes:
       - clickhouse-data-volume:/var/lib/clickhouse
       - clickhouse-log-volume:/var/log/clickhouse-server

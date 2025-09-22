@@ -1,5 +1,5 @@
 import random
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from faker import Faker
 
@@ -7,11 +7,19 @@ from .models import User, Friend, Post, Comment, Like, Reaction, Community, Grou
 
 faker = Faker()
 
+def get_random_created_at():
+    """Генерирует случайную дату от месяца назад до текущего времени"""
+    now = datetime.now()
+    month_ago = now - timedelta(days=7)
+    time_diff = now - month_ago
+    random_seconds = random.randint(0, int(time_diff.total_seconds()))
+    return month_ago + timedelta(seconds=random_seconds)
+
 def generate_user(user_id=None, created_at=None):
     return User(
         user_id=user_id or f"user_{faker.unique.random_int(1, 10000)}",
         name=faker.name(),
-        created_at=created_at or datetime.now()
+        created_at=created_at or get_random_created_at()
     )
 
 def generate_friend(user_ids, created_at=None):
@@ -19,7 +27,7 @@ def generate_friend(user_ids, created_at=None):
     return Friend(
         user_id=u1,
         friend_id=u2,
-        created_at=created_at or datetime.now()
+        created_at=created_at or get_random_created_at()
     )
 
 def generate_post(user_id, created_at=None):
@@ -27,7 +35,7 @@ def generate_post(user_id, created_at=None):
         post_id=f"post_{faker.unique.random_int(1, 100000)}",
         user_id=user_id,
         text=faker.text(max_nb_chars=140),
-        created_at=created_at or datetime.now()
+        created_at=created_at or get_random_created_at()
     )
 
 def generate_comment(user_id, post_id, created_at=None):
@@ -36,7 +44,7 @@ def generate_comment(user_id, post_id, created_at=None):
         post_id=post_id,
         user_id=user_id,
         text=faker.text(max_nb_chars=100),
-        created_at=created_at or datetime.now()
+        created_at=created_at or get_random_created_at()
     )
 
 def generate_like(user_id, target_type, target_id, created_at=None):
@@ -45,7 +53,7 @@ def generate_like(user_id, target_type, target_id, created_at=None):
         user_id=user_id,
         target_type=target_type,
         target_id=target_id,
-        created_at=created_at or datetime.now()
+        created_at=created_at or get_random_created_at()
     )
 
 def generate_reaction(user_id, target_type, target_id, reaction_type, created_at=None):
@@ -55,21 +63,21 @@ def generate_reaction(user_id, target_type, target_id, reaction_type, created_at
         target_type=target_type,
         target_id=target_id,
         reaction=reaction_type,
-        created_at=created_at or datetime.now()
+        created_at=created_at or get_random_created_at()
     )
 
 def generate_community(created_at=None):
     return Community(
         community_id=f"community_{faker.unique.random_int(1, 10000)}",
         title=faker.company(),
-        created_at=created_at or datetime.now()
+        created_at=created_at or get_random_created_at()
     )
 
 def generate_group_member(community_id, user_id, joined_at=None):
     return GroupMember(
         community_id=community_id,
         user_id=user_id,
-        joined_at=joined_at or datetime.now()
+        joined_at=joined_at or get_random_created_at()
     )
 
 def generate_media(post_id=None, created_at=None):
@@ -79,7 +87,7 @@ def generate_media(post_id=None, created_at=None):
         media_type=random.choice(media_types),
         url=faker.image_url(),
         attached_to_post=post_id,
-        created_at=created_at or datetime.now()
+        created_at=created_at or get_random_created_at()
     )
 
 def generate_pinned_post(community_id, post_id):
