@@ -1,15 +1,11 @@
 from datetime import datetime, timedelta
-from textwrap import dedent
 from dotenv import load_dotenv
-
 from airflow import DAG # type: ignore
 from airflow.operators.python import PythonOperator # type: ignore
+from processed_data.loaders.raw_to_dds import process_raw_entity
+from processed_data.utils.telegram_notifier import telegram_notifier
 
-# Загружаем переменные окружения из .env файла
 load_dotenv()
-
-from etl.loaders.raw_to_dds import process_raw_entity
-from etl.utils.telegram_notifier import telegram_notifier
 
 default_args = {
     "owner": "serzik",
@@ -22,17 +18,11 @@ default_args = {
 
 with DAG(
     dag_id="3_RAW_to_DDS_dag",
-    description="Перенос сущностей RAW → DDS в корректном порядке зависимостей, дедуп и FK/PK.",
-    doc_md=dedent("""
-    ### Что делает DAG
-    - Последовательно загружает user → friend → post → comment → reaction → community → group_member → media → pinned_post.
-    - Обеспечивает идемпотентность (уникальные индексы/merge).
-    - Готовит данные для Neo4j/витрин.
-    """),
+    description="Перенос данных из RAW в DDS.",
     default_args=default_args,
     schedule_interval="*/5 * * * *", # запуск каждые 5 минут
     start_date=datetime(2024, 7, 31),
-    catchup=False,
+    catchup=True,
     max_active_runs=1,
     tags=["ddl", "dds", "postgres"]
 ) as dag:

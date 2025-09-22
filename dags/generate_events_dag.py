@@ -1,9 +1,7 @@
 import os
 import sys
 from datetime import datetime, timedelta
-from textwrap import dedent
 from dotenv import load_dotenv
-
 from airflow import DAG # type: ignore
 from airflow.operators.python import PythonOperator # type: ignore
 
@@ -11,8 +9,8 @@ from airflow.operators.python import PythonOperator # type: ignore
 load_dotenv()
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "data_generator"))
-from generator.generate_events import generate_to_kafka, generate_to_minio, generate_all_data_and_return
-from etl.utils.telegram_notifier import telegram_notifier
+from generate_data.generate_events import generate_to_kafka, generate_to_minio, generate_all_data_and_return
+from processed_data.utils.telegram_notifier import telegram_notifier
 
 default_args = {
     "owner": "serzik",
@@ -23,20 +21,14 @@ default_args = {
 }
 
 with DAG(
-    dag_id="1_DATA_GENERATOR_to_kafka_and_minio_each_minute",
-    description="Генерация исторических/стриминговых данных (Faker) → Kafka и MinIO (батчи) каждую минуту",
-    doc_md=dedent("""
-    ### Что делает DAG
-    - Генерирует данные пользователей/посты/комменты/реакции/дружбу/сообщества каждую минуту.
-    - Пишет в Kafka топики и складывает батчи JSON в MinIO под датированными именами.
-    - Нежелательно использовать для backfill.
-    """),
+    dag_id="1_DATA_GENERATE_to_kafka_and_minio",
+    description="Генерация данных в Kafka и MinIO",
     default_args=default_args,
-    schedule_interval="* * * * *", #генерируем данные каждую минуту
+    schedule_interval="* * * * *", #генерация каждую минуту
     start_date=datetime(2024, 7, 1),
-    catchup=False,
+    catchup=True,
     max_active_runs=1,
-    tags=["generator", "raw", "minio", "kafka"],
+    tags=["generate_data", "raw", "minio", "kafka"],
 ) as dag:
 
     generate_data = PythonOperator(

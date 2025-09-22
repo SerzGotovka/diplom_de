@@ -1,17 +1,13 @@
 from datetime import datetime
-from textwrap import dedent
 from dotenv import load_dotenv
-
 from airflow import DAG # type: ignore
 from airflow.operators.python import PythonOperator # type: ignore
+from processed_data.loaders.dds_to_clickhouse_community_stats_metric import upsert_community_stats
+from processed_data.loaders.dds_to_clickhouse_daily_platform_stats_metric import upsert_daily_platform_stats
+from processed_data.loaders.neo4j_dds_to_clickhouse_social_graph_stats_metric import upsert_social_graph_stats
+from processed_data.utils.telegram_notifier import telegram_notifier
 
-# Загружаем переменные окружения из .env файла
 load_dotenv()
-
-from etl.loaders.dds_to_clickhouse_community_stats_metric import upsert_community_stats
-from etl.loaders.dds_to_clickhouse_daily_platform_stats_metric import upsert_daily_platform_stats
-from etl.loaders.neo4j_dds_to_clickhouse_social_graph_stats_metric import upsert_social_graph_stats
-from etl.utils.telegram_notifier import telegram_notifier
 
 default_args = {
     "owner": "serzik",
@@ -22,14 +18,8 @@ default_args = {
 
 
 with DAG(
-    dag_id="5_BUILD_MARTS_TO_CLICKHOUSE",
-    description="Расчёт агрегатов (DAU/WAU/MAU, сообщества, граф) и загрузка витрин в ClickHouse.",
-    doc_md=dedent("""
-    ### Что делает DAG
-    - Считает метрики платформы (окна [d0,d1), [w0,d1), [m0,d1)).
-    - Строит суточную статистику по сообществам.
-    - Выгружает summary графа и degree centrality из Neo4j.
-    """),
+    dag_id="5_CREATE_DATA_MARTS_TO_CLICKHOUSE",
+    description="Расчёт агрегатов и загрузка витрин в ClickHouse.",
     schedule_interval="@daily",
     start_date=datetime(2024, 7, 1),
     catchup=True,
@@ -48,7 +38,7 @@ with DAG(
         task_id="dm_social_graph_stats",
         python_callable=upsert_social_graph_stats,
         op_kwargs={
-            "as_of_date": "{{ ds }}",  # строка 'YYYY-MM-DD'
+            "as_of_date": "{{ ds }}",  
             "as_of_end_ts": "{{ data_interval_end | ts }}"
         }
     )

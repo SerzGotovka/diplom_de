@@ -1,15 +1,11 @@
 from datetime import datetime, timedelta
-from textwrap import dedent
 from dotenv import load_dotenv
-
 from airflow import DAG # type: ignore
 from airflow.operators.python import PythonOperator # type: ignore
+from processed_data.ingestion import ingest_from_kafka_topics
+from processed_data.utils.telegram_notifier import telegram_notifier
 
-# Загружаем переменные окружения из .env файла
 load_dotenv()
-
-from etl.ingestion import ingest_from_kafka_topics
-from etl.utils.telegram_notifier import telegram_notifier
 
 default_args = {
     "owner": "serzik",
@@ -22,19 +18,13 @@ HEAVY = ["likes", "comments", "reactions", "posts"]
 LIGHT = ["users", "friends", "communities", "group_members", "media", "pinned_posts"]
 
 with DAG(
-    dag_id="2_INGEST_RAW_FROM_KAFKA",
-    description="Потоковый ingest из Kafka в RAW (Postgres) батчами с ручным коммитом оффсетов.",
-    doc_md=dedent("""
-    ### Что делает DAG
-    - Читает из топиков users/friends/posts/... с буферизацией.
-    - Вставляет в RAW.* батчами, после успешного коммита — фиксирует оффсеты.
-    - Настраивается по batch_size/flush_sec/idle_sec.
-    """),
+    dag_id="2_TRANSFER_RAW_FROM_KAFKA",
+    description="Перенос данных из Kafka в RAW.",
     default_args=default_args,
     start_date=datetime(2024, 7, 29),
-    schedule_interval="*/2 * * * *",  # каждые 2 минуты (чтобы дать времени на догон)
-    catchup=False,
-    max_active_runs=1,                 # один запуск DAG одновременно
+    schedule_interval="*/2 * * * *", 
+    catchup=True,
+    max_active_runs=1,               
     tags=["raw", "ingest", "kafka"],
 ) as dag:
 

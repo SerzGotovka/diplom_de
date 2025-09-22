@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="7059219f-b0a2-4e2f-a43b-8baf266d1fb4" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/dags/build_marts_dag.py" beforeDir="false" afterPath="$PROJECT_DIR$/dags/build_marts_dag.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dags/dds_nodes_and_relations_to_neo4j_dag.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dags/etl/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/dags/generate_data/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dags/etl/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/dags/processed_data/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dags/etl/create_database.py" beforeDir="false" afterPath="$PROJECT_DIR$/dags/processed_data/create_database.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dags/etl/ingestion.py" beforeDir="false" afterPath="$PROJECT_DIR$/dags/processed_data/ingestion.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dags/etl/init_schemas_clickhouse.py" beforeDir="false" afterPath="$PROJECT_DIR$/dags/processed_data/init_schemas_clickhouse.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dags/etl/init_schemas_neo4j.py" beforeDir="false" afterPath="$PROJECT_DIR$/dags/processed_data/init_schemas_neo4j.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dags/etl/init_schemas_postgres.py" beforeDir="false" afterPath="$PROJECT_DIR$/dags/processed_data/init_schemas_postgres.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dags/etl/loaders/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/dags/processed_data/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dags/etl/loaders/dds_to_clickhouse_community_stats_metric.py" beforeDir="false" afterPath="$PROJECT_DIR$/dags/processed_data/loaders/dds_to_clickhouse_community_stats_metric.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dags/etl/loaders/dds_to_clickhouse_daily_platform_stats_metric.py" beforeDir="false" afterPath="$PROJECT_DIR$/dags/processed_data/loaders/dds_to_clickhouse_daily_platform_stats_metric.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dags/etl/loaders/dds_to_neo4j_nodes.py" beforeDir="false" afterPath="$PROJECT_DIR$/dags/processed_data/loaders/dds_to_neo4j_nodes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dags/etl/loaders/dds_to_neo4j_relations.py" beforeDir="false" afterPath="$PROJECT_DIR$/dags/processed_data/loaders/dds_to_neo4j_relations.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dags/etl/loaders/neo4j_dds_to_clickhouse_social_graph_stats_metric.py" beforeDir="false" afterPath="$PROJECT_DIR$/dags/processed_data/loaders/neo4j_dds_to_clickhouse_social_graph_stats_metric.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dags/etl/loaders/raw_to_dds.py" beforeDir="false" afterPath="$PROJECT_DIR$/dags/processed_data/loaders/raw_to_dds.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dags/etl/loaders_utils/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/dags/processed_data/loaders/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dags/etl/loaders_utils/load_cypher.py" beforeDir="false" afterPath="$PROJECT_DIR$/dags/processed_data/loaders_utils/load_cypher.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dags/etl/loaders_utils/load_sql.py" beforeDir="false" afterPath="$PROJECT_DIR$/dags/processed_data/loaders_utils/load_sql.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dags/etl/save_to_dds.py" beforeDir="false" afterPath="$PROJECT_DIR$/dags/processed_data/save_to_dds.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dags/etl/save_to_raw.py" beforeDir="false" afterPath="$PROJECT_DIR$/dags/processed_data/save_to_raw.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dags/etl/utils/telegram_notifier.py" beforeDir="false" afterPath="$PROJECT_DIR$/dags/processed_data/utils/telegram_notifier.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dags/generate_events_dag.py" beforeDir="false" afterPath="$PROJECT_DIR$/dags/generate_events_dag.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dags/generate_events_dag_daily.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dags/generator/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/dags/processed_data/loaders_utils/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dags/generator/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/dags/generate_data/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dags/generator/generate_events.py" beforeDir="false" afterPath="$PROJECT_DIR$/dags/generate_data/generate_events.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dags/generator/generators.py" beforeDir="false" afterPath="$PROJECT_DIR$/dags/generate_data/generators.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dags/generator/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/dags/generate_data/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dags/generator/writer.py" beforeDir="false" afterPath="$PROJECT_DIR$/dags/generate_data/writer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dags/ingest_raw_from_kafka_dag.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dags/ingest_raw_from_minio_dag.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dags/init_schemas_dag.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/dags/raw_to_dds_dag.py" beforeDir="false" afterPath="$PROJECT_DIR$/dags/raw_to_dds_dag.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 4
+}]]></component>
+  <component name="ProjectId" id="333PY8EXoxIcUZ05zF7VUmto219" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "D:/КУРСЫ/TMS DE/PROJECTS/diplom-tms"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-fc1d50d2d915-aa17d162503b-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-243.24978.54" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="7059219f-b0a2-4e2f-a43b-8baf266d1fb4" name="Changes" comment="" />
+      <created>1758542826983</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1758542826983</updated>
+    </task>
+    <servers />
+  </component>
+</project>

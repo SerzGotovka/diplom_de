@@ -2,7 +2,7 @@ import logging
 import os
 from dotenv import load_dotenv
 
-from airflow.providers.postgres.hooks.postgres import PostgresHook
+from airflow.providers.postgres.hooks.postgres import PostgresHook # type: ignore
 
 # Загружаем переменные окружения из .env файла
 load_dotenv()

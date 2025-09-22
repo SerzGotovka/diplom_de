@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 
 from airflow.providers.postgres.hooks.postgres import PostgresHook # type: ignore
 from ..save_to_dds import save_to_dds
-from generator.models import User, Friend, Post, Comment, Like, Reaction, Community, GroupMember, Media, PinnedPost
+from generate_data.models import User, Friend, Post, Comment, Like, Reaction, Community, GroupMember, Media, PinnedPost
 
 # Загружаем переменные окружения из .env файла
 load_dotenv()
