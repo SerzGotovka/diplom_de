@@ -1,20 +1,23 @@
 from datetime import datetime, timedelta
 from textwrap import dedent
+from dotenv import load_dotenv
 
 from airflow import DAG
 from airflow.operators.python import PythonOperator
+
+# Загружаем переменные окружения из .env файла
+load_dotenv()
 
 from etl.loaders.raw_to_dds import process_raw_entity
 from etl.utils.telegram_notifier import telegram_notifier
 
 default_args = {
-    "owner": "airflow",
+    "owner": "serzik",
     "retries": 3,
     "retry_delay": timedelta(seconds=30),
     "on_success_callback": telegram_notifier,
     "on_failure_callback": telegram_notifier,
-    "pool": "postgres_dwh",   # дефолтный пул для всех тасков DAG'а
-    "pool_slots": 1,          # сколько слотов за раз занимает таск
+              # сколько слотов за раз занимает таск
 }
 
 with DAG(

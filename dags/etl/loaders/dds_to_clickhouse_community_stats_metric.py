@@ -1,20 +1,23 @@
 import datetime as dt
 import logging
+from dotenv import load_dotenv
 
-import psycopg2
 from clickhouse_driver import Client
+from airflow.providers.postgres.hooks.postgres import PostgresHook
 
-from ..config import get_postgres_config, get_clickhouse_config
+from ..config import get_clickhouse_config
 from ..loaders_utils.load_sql import load_sql
+
+# Загружаем переменные окружения из .env файла
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
 def _fetch_rows_from_pg(as_of_date: dt.date):
     sql = load_sql("select_community_stats.sql", layer="dql", subdir="data_mart")
-    pg = get_postgres_config()
-    with psycopg2.connect(**pg) as conn, conn.cursor() as cur:
-        cur.execute(sql, {"as_of_date": as_of_date})
-        rows = cur.fetchall()
+    pg_hook = PostgresHook(postgres_conn_id="my_postgress_conn")
+    # В SQL-запросе используется %s три раза, поэтому передаем параметр три раза
+    rows = pg_hook.get_records(sql, parameters=[as_of_date, as_of_date, as_of_date])
     return rows  # [(dt, group_id, new_members, posts, comments, reactions), ...]
 
 def upsert_community_stats(as_of_date: dt.date = None):

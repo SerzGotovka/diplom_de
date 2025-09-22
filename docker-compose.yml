@@ -72,11 +72,35 @@ x-airflow-common:
     # for other purpose (development, test and especially production usage) build/extend Airflow image.
     _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:- pandas pydantic faker openpyxl pymongo clickhouse-driver neo4j kafka-python minio}
     
+    # Database connection variables
+    POSTGRES_HOST: postgres
+    POSTGRES_PORT: 5432
+    POSTGRES_USER: ${POSTGRES_USER:-airflow}
+    POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-airflow}
+    POSTGRES_DB: ${POSTGRES_DB:-airflow}
+    
+    CLICKHOUSE_HOST: clickhouse
+    CLICKHOUSE_PORT: 9000
+    CLICKHOUSE_USER: ${CLICKHOUSE_USER:-airflow}
+    CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-airflow}
+    CLICKHOUSE_DB: ${CLICKHOUSE_DB:-data_mart}
+    
+    NEO4J_HOST: neo4j
+    NEO4J_PORT: 7687
+    NEO4J_USER: ${NEO4J_USER:-neo4j}
+    NEO4J_PASSWORD: ${NEO4J_PASSWORD:-password}
+    
+    # Kafka configuration
+    KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    MINIO_BUCKET: ${MINIO_BUCKET:-events}
+    
   volumes:
     - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
     - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
     - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
+    - ${AIRFLOW_PROJ_DIR:-.}/sql:/opt/airflow/sql
+    - ${AIRFLOW_PROJ_DIR:-.}/cypher:/opt/airflow/cypher
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
@@ -182,9 +206,9 @@ services:
         soft: 262144
         hard: 262144
     environment:
-      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-default}
-      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-password}
-      CLICKHOUSE_DB: ${CLICKHOUSE_DB:-default}
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-airflow}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-airflow}
+      CLICKHOUSE_DB: ${CLICKHOUSE_DB:-data_mart}
     volumes:
       - clickhouse-data-volume:/var/lib/clickhouse
       - clickhouse-log-volume:/var/log/clickhouse-server

@@ -1,15 +1,19 @@
 from datetime import datetime, timedelta
 from textwrap import dedent
+from dotenv import load_dotenv
 
 from airflow import DAG
 from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
 
+# Загружаем переменные окружения из .env файла
+load_dotenv()
+
 from etl.utils.telegram_notifier import telegram_notifier
 from generator.generate_events import generate_to_kafka, generate_to_minio, generate_all_data_and_return
 
 default_args = {
-    "owner": "airflow",
+    "owner": "serzik",
     "retries": 3,
     "retry_delay": timedelta(seconds=30),
     "on_success_callback": telegram_notifier,

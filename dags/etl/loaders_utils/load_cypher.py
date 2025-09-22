@@ -1,6 +1,8 @@
 import os
+from dotenv import load_dotenv
 
-import psycopg2
+# Загружаем переменные окружения из .env файла
+load_dotenv()
 
 
 def load_cypher(query_file, layer="dml", subdir=""):

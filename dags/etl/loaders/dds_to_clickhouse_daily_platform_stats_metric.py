@@ -1,22 +1,34 @@
 import datetime as dt
 import logging
+from dotenv import load_dotenv
 
-import psycopg2
 from clickhouse_driver import Client
+from airflow.providers.postgres.hooks.postgres import PostgresHook
 
-from ..config import get_postgres_config, get_clickhouse_config
+from ..config import get_clickhouse_config
 from ..loaders_utils.load_sql import load_sql
+
+# Загружаем переменные окружения из .env файла
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
 def _fetch_metrics_from_pg(as_of_date: dt.date):
     sql = load_sql("select_daily_platform_stats.sql", layer="dql", subdir="data_mart")
-    pg = get_postgres_config()
-    with psycopg2.connect(**pg) as conn, conn.cursor() as cur:
-        cur.execute(sql, {"as_of_date": as_of_date})
-        row = cur.fetchone()
-        cols = [d[0] for d in cur.description]
-    return dict(zip(cols, row))
+    pg_hook = PostgresHook(postgres_conn_id="my_postgress_conn")
+    # В SQL-запросе используется %s пять раз, поэтому передаем параметр пять раз
+    row = pg_hook.get_first(sql, parameters=[as_of_date, as_of_date, as_of_date, as_of_date, as_of_date])
+    
+    # Получаем названия колонок через описание курсора
+    # Убираем точку с запятой из SQL запроса для корректного подзапроса
+    sql_clean = sql.rstrip().rstrip(';')
+    columns_query = f"SELECT * FROM ({sql_clean}) AS subquery LIMIT 1"
+    cursor = pg_hook.get_conn().cursor()
+    cursor.execute(columns_query, [as_of_date, as_of_date, as_of_date, as_of_date, as_of_date])
+    columns = [desc[0] for desc in cursor.description]
+    cursor.close()
+    
+    return dict(zip(columns, row))
 
 def upsert_daily_platform_stats(as_of_date: dt.date = None):
     """
@@ -26,6 +38,19 @@ def upsert_daily_platform_stats(as_of_date: dt.date = None):
         as_of_date = dt.date.today()
 
     metrics = _fetch_metrics_from_pg(as_of_date)
+    
+    # Отладочная информация
+    logger.info(f"Полученные метрики: {metrics}")
+    logger.info(f"Ключи в метриках: {list(metrics.keys())}")
+    
+    # Проверяем, что все необходимые ключи присутствуют
+    required_keys = ["dt", "total_posts", "total_comments", "total_reactions", 
+                    "interactions_per_post", "dau", "wau", "mau", 
+                    "dau_wau_ratio", "wau_mau_ratio"]
+    missing_keys = [key for key in required_keys if key not in metrics]
+    if missing_keys:
+        raise KeyError(f"Отсутствуют необходимые ключи в метриках: {missing_keys}")
+    
     # подготовка значений для вставки в CH
     values = (
         metrics["dt"],

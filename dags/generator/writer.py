@@ -2,15 +2,11 @@ import io
 import json
 
 from kafka import KafkaProducer
-from minio import Minio
+from airflow.providers.amazon.aws.hooks.s3 import S3Hook # type: ignore
 
 from .config import (
     get_kafka_bootstrap_servers,
-    get_minio_endpoint,
-    get_minio_access_key,
-    get_minio_secret_key,
     get_minio_bucket,
-    get_minio_use_ssl,
 )
 
 
@@ -23,20 +19,18 @@ def write_to_kafka(topic, event):
     producer.flush()
 
 def write_to_minio(filename, events):
-    client = Minio(
-        get_minio_endpoint(),
-        access_key=get_minio_access_key(),
-        secret_key=get_minio_secret_key(),
-        secure=get_minio_use_ssl()
-    )
-    if not client.bucket_exists(get_minio_bucket()):
-        client.make_bucket(get_minio_bucket())
+    s3_hook = S3Hook(aws_conn_id="minio_conn")
+    bucket = get_minio_bucket()
+    
+    # Проверяем существование bucket и создаем если нужно
+    if not s3_hook.check_for_bucket(bucket):
+        s3_hook.create_bucket(bucket)
+    
     data = json.dumps([event for event in events], default=str).encode("utf-8")
-    client.put_object(
-        get_minio_bucket(),
-        filename,
-        io.BytesIO(data),
-        length=len(data)
+    s3_hook.load_bytes(
+        data,
+        key=filename,
+        bucket_name=bucket
     )
 
 def write_to_file(filename, events):

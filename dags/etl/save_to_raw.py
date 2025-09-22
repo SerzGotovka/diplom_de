@@ -1,10 +1,12 @@
 import json
 import logging
+from dotenv import load_dotenv
 
-import psycopg2
-
-from .config import get_postgres_config
+from airflow.providers.postgres.hooks.postgres import PostgresHook
 from .loaders_utils.load_sql import load_sql
+
+# Загружаем переменные окружения из .env файла
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
@@ -59,13 +61,12 @@ def mark_object_processed(storage: str, object_key: str, etag: str, cur) -> None
     cur.execute(sql, {"storage": storage, "object_key": object_key, "etag": etag})
 
 def save_to_raw(event, event_type):
-    cfg = get_postgres_config()
-    with psycopg2.connect(**cfg) as conn, conn.cursor() as cur:
-        if event_type not in _sql_map:
-            logger.warning(f"[WARN] Unknown event type for RAW: {event_type}")
-            return
-        sql = _get_sql(event_type)
-        cur.execute(sql, {"event_json": json.dumps(event)})
+    pg_hook = PostgresHook(postgres_conn_id="my_postgress_conn")
+    if event_type not in _sql_map:
+        logger.warning(f"[WARN] Unknown event type for RAW: {event_type}")
+        return
+    sql = _get_sql(event_type)
+    pg_hook.run(sql, parameters={"event_json": json.dumps(event)})
 
 def save_to_raw_bulk(event_type, events, cur):
     if not events:

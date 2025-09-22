@@ -1,10 +1,10 @@
 WITH params AS (
     SELECT
-        date_trunc('day', %(as_of_date)s::timestamp) AS d0,
-        date_trunc('day', %(as_of_date)s::timestamp) + INTERVAL '1 day' AS d1
+        date_trunc('day', %s::timestamp) AS d0,
+        date_trunc('day', %s::timestamp) + INTERVAL '1 day' AS d1
 )
 SELECT
-    %(as_of_date)s::date AS dt,
+    %s::date AS dt,
     '__all__'::varchar   AS community_id,
 
     (SELECT COUNT(*)::bigint

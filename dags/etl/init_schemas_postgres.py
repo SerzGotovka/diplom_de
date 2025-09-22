@@ -1,16 +1,16 @@
 import logging
 import os
+from dotenv import load_dotenv
 
-import psycopg2
+from airflow.providers.postgres.hooks.postgres import PostgresHook
 
-from .config import get_postgres_config
+# Загружаем переменные окружения из .env файла
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
 def run_sql_files(folder_or_file):
-    config = get_postgres_config()
-    conn = psycopg2.connect(**config)
-    cur = conn.cursor()
+    pg_hook = PostgresHook(postgres_conn_id="my_postgress_conn")
 
     # Если это файл — выполняем просто его, если папка — все файлы по алфавиту
     if os.path.isfile(folder_or_file):
@@ -21,7 +21,4 @@ def run_sql_files(folder_or_file):
         with open(file, encoding='utf-8') as f:
             sql = f.read()
             logger.info(f"Running {file}...")
-            cur.execute(sql)
-    conn.commit()
-    cur.close()
-    conn.close()
+            pg_hook.run(sql)

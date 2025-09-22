@@ -1,15 +1,19 @@
 from datetime import datetime
 from textwrap import dedent
+from dotenv import load_dotenv
 
 from airflow import DAG
 from airflow.operators.python import PythonOperator
+
+# Загружаем переменные окружения из .env файла
+load_dotenv()
 
 from etl.loaders.dds_to_neo4j_nodes import copy_nodes_to_neo4j
 from etl.loaders.dds_to_neo4j_relations import copy_all_relations
 from etl.utils.telegram_notifier import telegram_notifier
 
 default_args = {
-    "owner": "airflow",
+    "owner": "serzik",
     "retries": 3,
     "on_success_callback": telegram_notifier,
     "on_failure_callback": telegram_notifier
@@ -33,14 +37,14 @@ with DAG(
 ) as dag:
     create_nodes = PythonOperator(
         task_id="copy_nodes_to_neo4j",
-        python_callable=copy_nodes_to_neo4j,
-        pool="postgres_dwh"
+        python_callable=copy_nodes_to_neo4j
+        
     )
 
     create_relations = PythonOperator(
         task_id="copy_relations_to_neo4j",
-        python_callable=copy_all_relations,
-        pool="postgres_dwh"
+        python_callable=copy_all_relations
+       
     )
 
     create_nodes >> create_relations

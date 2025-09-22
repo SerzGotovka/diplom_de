@@ -1,9 +1,9 @@
 WITH b AS (
     SELECT
-        date_trunc('day', %(as_of_date)s::timestamp)                      AS d0,
-        date_trunc('day', %(as_of_date)s::timestamp) + INTERVAL '1 day'   AS d1,
-        date_trunc('day', %(as_of_date)s::timestamp) - INTERVAL '6 days'  AS w0,
-        date_trunc('day', %(as_of_date)s::timestamp) - INTERVAL '29 days' AS m0
+        date_trunc('day', %s::timestamp)                      AS d0,
+        date_trunc('day', %s::timestamp) + INTERVAL '1 day'   AS d1,
+        date_trunc('day', %s::timestamp) - INTERVAL '6 days'  AS w0,
+        date_trunc('day', %s::timestamp) - INTERVAL '29 days' AS m0
 ),
 
 -- суточные счётчики (строго за [d0; d1))
@@ -53,7 +53,7 @@ active_m AS (
 )
 
 SELECT
-    %(as_of_date)s::date AS dt,
+    %s::date AS dt,
     (SELECT c FROM posts_day)     AS total_posts,
     (SELECT c FROM comments_day)  AS total_comments,
     (SELECT c FROM reactions_day) AS total_reactions,

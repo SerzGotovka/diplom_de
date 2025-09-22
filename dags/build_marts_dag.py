@@ -1,8 +1,12 @@
 from datetime import datetime
 from textwrap import dedent
+from dotenv import load_dotenv
 
 from airflow import DAG
 from airflow.operators.python import PythonOperator
+
+# Загружаем переменные окружения из .env файла
+load_dotenv()
 
 from etl.loaders.dds_to_clickhouse_community_stats_metric import upsert_community_stats
 from etl.loaders.dds_to_clickhouse_daily_platform_stats_metric import upsert_daily_platform_stats
@@ -10,12 +14,10 @@ from etl.loaders.neo4j_dds_to_clickhouse_social_graph_stats_metric import upsert
 from etl.utils.telegram_notifier import telegram_notifier
 
 default_args = {
-    "owner": "airflow",
+    "owner": "serzik",
     "retries": 3,
     "on_failure_callback": telegram_notifier,
-    "on_success_callback": telegram_notifier,
-    "pool": "postgres_dwh",
-    "pool_slots": 1,
+    "on_success_callback": telegram_notifier
 }
 
 
@@ -48,8 +50,7 @@ with DAG(
         op_kwargs={
             "as_of_date": "{{ ds }}",  # строка 'YYYY-MM-DD'
             "as_of_end_ts": "{{ data_interval_end | ts }}"
-        },
-        pool="neo4j"
+        }
     )
 
     dm_comm = PythonOperator(

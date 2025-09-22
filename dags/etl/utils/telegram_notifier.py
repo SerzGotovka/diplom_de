@@ -1,11 +1,15 @@
 import logging
 import os
 from html import escape
+from dotenv import load_dotenv
 
 import requests
 
+# Загружаем переменные окружения из .env файла
+load_dotenv()
+
 log = logging.getLogger(__name__)
-DETAIL_LIMIT = 3900
+
 
 def _get_creds():
     chat_id = os.getenv("TELEGRAM_CHAT_ID")
@@ -78,7 +82,7 @@ def telegram_notifier(context):
         )
     else:
         details_raw = str(exception) if exception else "нет данных"
-        details_tail = _tail(details_raw, DETAIL_LIMIT)
+        details_tail = _tail(details_raw)
         msg = (
             f"❌Ошибка в задаче <b><code>{escape(task_id)}</code></b>\n"
             f"DAG <b><code>{escape(dag_id)}</code></b>\n"

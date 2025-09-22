@@ -1,9 +1,13 @@
 import os
 from datetime import datetime
 from textwrap import dedent
+from dotenv import load_dotenv
 
 from airflow import DAG
 from airflow.operators.python import PythonOperator
+
+# Загружаем переменные окружения из .env файла
+load_dotenv()
 
 from etl.create_database import create_pg_database, create_clickhouse_database
 from etl.init_schemas_clickhouse import run_ch_sql_folder

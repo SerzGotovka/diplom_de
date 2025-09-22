@@ -1,14 +1,18 @@
 from datetime import datetime, timedelta
 from textwrap import dedent
+from dotenv import load_dotenv
 
 from airflow import DAG
 from airflow.operators.python import PythonOperator
+
+# Загружаем переменные окружения из .env файла
+load_dotenv()
 
 from etl.ingestion import ingest_from_minio
 from etl.utils.telegram_notifier import telegram_notifier
 
 default_args = {
-    "owner": "airflow",
+    "owner": "serzik",
     "retries": 3,
     "retry_delay": timedelta(minutes=2),
     "on_success_callback": telegram_notifier,

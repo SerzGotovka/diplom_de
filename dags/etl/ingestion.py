@@ -3,15 +3,18 @@ import logging
 import time
 from collections import defaultdict
 from typing import Dict, List, Any, Iterable
+from dotenv import load_dotenv
 
-import psycopg2
 from kafka import KafkaConsumer
-from minio import Minio
+from airflow.providers.postgres.hooks.postgres import PostgresHook # type: ignore
+from airflow.providers.amazon.aws.hooks.s3 import S3Hook # type: ignore
+
+# Загружаем переменные окружения из .env файла
+load_dotenv()
 
 from .config import (
     get_kafka_bootstrap_servers,
-    get_minio_endpoint, get_minio_access_key, get_minio_secret_key,
-    get_minio_bucket, get_minio_use_ssl, get_postgres_config
+    get_minio_bucket
 )
 from .save_to_raw import (
     save_to_raw_bulk,
@@ -54,8 +57,8 @@ def ingest_from_kafka_topics(
         fetch_max_wait_ms=500,
     )
 
-    pg = get_postgres_config()
-    conn = psycopg2.connect(**pg)
+    pg_hook = PostgresHook(postgres_conn_id="my_postgress_conn")
+    conn = pg_hook.get_conn()
     cur = conn.cursor()
 
     buffers: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
@@ -147,21 +150,11 @@ def ingest_from_minio(prefix: str = "", recursive: bool = True, batch_size: int 
     Объекты НЕ удаляются. Вместо этого, в raw.processed_objects ставится отметка,
     чтобы не обрабатывать повторно.
     """
-    client = Minio(
-        get_minio_endpoint(),
-        access_key=get_minio_access_key(),
-        secret_key=get_minio_secret_key(),
-        secure=get_minio_use_ssl(),
-    )
+    s3_hook = S3Hook(aws_conn_id="minio_conn")
     bucket = get_minio_bucket()
 
-    pg = get_postgres_config()
-    # добавил keepalive, чтобы сократить висящие соединения в TIME_WAIT и реюзать TCP
-    dsn = (
-        f"host={pg['host']} dbname={pg['dbname']} user={pg['user']} password={pg['password']} "
-        "keepalives=1 keepalives_idle=30 keepalives_interval=10 keepalives_count=5"
-    )
-    conn = psycopg2.connect(dsn)
+    pg_hook = PostgresHook(postgres_conn_id="my_postgress_conn")
+    conn = pg_hook.get_conn()
     cur = conn.cursor()
 
     processed = 0
@@ -169,9 +162,11 @@ def ingest_from_minio(prefix: str = "", recursive: bool = True, batch_size: int 
 
     try:
         logger.info(f"[MinIO] Scan bucket={bucket} prefix='{prefix}' recursive={recursive}")
-        for obj in client.list_objects(bucket, prefix=prefix, recursive=recursive):
-            key = obj.object_name
-
+        
+        # Получаем список объектов из S3
+        objects = s3_hook.list_keys(bucket_name=bucket, prefix=prefix)
+        
+        for key in objects:
             # проверяем - уже обработан?
             if is_object_processed("minio", key, cur):
                 skipped += 1
@@ -181,7 +176,9 @@ def ingest_from_minio(prefix: str = "", recursive: bool = True, batch_size: int 
 
             # читаем и парсим
             try:
-                data = client.get_object(bucket, key).read()
+                data = s3_hook.read_key(key, bucket_name=bucket)
+                if isinstance(data, str):
+                    data = data.encode('utf-8')
             except Exception as e:
                 logger.error(f"[MinIO] Failed to read object {key}: {e}")
                 continue
@@ -217,8 +214,8 @@ def ingest_from_minio(prefix: str = "", recursive: bool = True, batch_size: int 
 
             # достаём etag и помечаем как обработанный
             try:
-                st = client.stat_object(bucket, key)
-                etag = getattr(st, "etag", None)
+                # S3Hook не предоставляет прямой доступ к etag, используем ключ как идентификатор
+                etag = key
             except Exception:
                 etag = None
 

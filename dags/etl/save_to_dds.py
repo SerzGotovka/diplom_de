@@ -1,16 +1,16 @@
 import logging
+from dotenv import load_dotenv
 
-import psycopg2
-
-from .config import get_postgres_config
+from airflow.providers.postgres.hooks.postgres import PostgresHook
 from .loaders_utils.load_sql import load_sql
+
+# Загружаем переменные окружения из .env файла
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
 def save_to_dds(event: dict, entity_type: str):
-    config = get_postgres_config()
-    conn = psycopg2.connect(**config)
-    cur = conn.cursor()
+    pg_hook = PostgresHook(postgres_conn_id="my_postgress_conn")
     sql_map = {
         "user": "insert_user.sql",
         "friend": "insert_friend.sql",
@@ -25,12 +25,7 @@ def save_to_dds(event: dict, entity_type: str):
     }
     if entity_type not in sql_map:
         logger.warning(f"[WARN] Unknown entity type for dds: {entity_type}")
-        cur.close()
-        conn.close()
         return
 
     sql = load_sql(sql_map[entity_type], subdir="dds")
-    cur.execute(sql, event)
-    conn.commit()
-    cur.close()
-    conn.close()
+    pg_hook.run(sql, parameters=event)

@@ -1,10 +1,12 @@
 import logging
+from dotenv import load_dotenv
 
-import psycopg2
-
-from ..config import get_postgres_config
+from airflow.providers.postgres.hooks.postgres import PostgresHook # type: ignore
 from ..save_to_dds import save_to_dds
 from generator.models import User, Friend, Post, Comment, Like, Reaction, Community, GroupMember, Media, PinnedPost
+
+# Загружаем переменные окружения из .env файла
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
@@ -23,14 +25,12 @@ ENTITY_META = {
 }
 
 def process_raw_entity(entity_type):
-    config = get_postgres_config()
-    conn = psycopg2.connect(**config)
-    cur = conn.cursor()
+    pg_hook = PostgresHook(postgres_conn_id="my_postgress_conn")
     meta = ENTITY_META[entity_type]
     table = meta["table"]
     Model = meta["model"]
-    cur.execute(f"SELECT event_json FROM raw.{table}")
-    rows = cur.fetchall()
+    
+    rows = pg_hook.get_records(f"SELECT event_json FROM raw.{table}")
     valid = 0
     errors = 0
     for row in rows:
@@ -47,8 +47,6 @@ def process_raw_entity(entity_type):
             errors += 1
             logger.error(f"[ERROR] Invalid {entity_type}: {e}")
     logger.info(f"{entity_type}: OK {valid}, ERRORS {errors}")
-    cur.close()
-    conn.close()
 
 def process_all_entities():
     for entity_type in ENTITY_META:

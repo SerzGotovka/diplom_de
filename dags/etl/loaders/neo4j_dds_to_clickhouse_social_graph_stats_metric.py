@@ -1,12 +1,16 @@
 import datetime as dt
 import logging
 from datetime import timezone, time
+from dotenv import load_dotenv
 
 from clickhouse_driver import Client
 from neo4j import GraphDatabase
 
 from ..config import get_neo4j_config, get_clickhouse_config
 from ..loaders_utils.load_cypher import load_cypher
+
+# Загружаем переменные окружения из .env файла
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 

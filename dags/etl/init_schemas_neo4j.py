@@ -1,9 +1,13 @@
 import logging
 import os
+from dotenv import load_dotenv
 
 from neo4j import GraphDatabase
 
 from .config import get_neo4j_config
+
+# Загружаем переменные окружения из .env файла
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
