@@ -3,7 +3,7 @@ import logging
 from dotenv import load_dotenv
 
 from clickhouse_driver import Client
-from airflow.providers.postgres.hooks.postgres import PostgresHook
+from airflow.providers.postgres.hooks.postgres import PostgresHook # type: ignore
 
 from ..config import get_clickhouse_config
 from ..loaders_utils.load_sql import load_sql

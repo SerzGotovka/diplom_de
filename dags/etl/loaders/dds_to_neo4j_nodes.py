@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 
 import pandas as pd
 from neo4j import GraphDatabase
-from airflow.providers.postgres.hooks.postgres import PostgresHook
+from airflow.providers.postgres.hooks.postgres import PostgresHook # type: ignore
 
 from ..config import get_neo4j_config
 from ..loaders_utils.load_cypher import load_cypher

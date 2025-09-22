@@ -2,9 +2,9 @@ from datetime import datetime, timedelta
 from textwrap import dedent
 from dotenv import load_dotenv
 
-from airflow import DAG
-from airflow.operators.bash import BashOperator
-from airflow.operators.python import PythonOperator
+from airflow import DAG # type: ignore
+from airflow.operators.bash import BashOperator # type: ignore
+from airflow.operators.python import PythonOperator # type: ignore
 
 # Загружаем переменные окружения из .env файла
 load_dotenv()
